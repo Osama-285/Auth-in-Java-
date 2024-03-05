@@ -16,8 +16,11 @@ import jakarta.validation.Valid;
 public class AuthController {
     @PostMapping(value = "/signup", produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Add a new User")
     public ResponseEntity<String> addUser(@Valid @RequestBody AccountDTO accountDTO) {
+        try {
 
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
     }
 }
