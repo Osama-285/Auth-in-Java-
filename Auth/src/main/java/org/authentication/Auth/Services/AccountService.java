@@ -16,6 +16,7 @@ public class AccountService {
     private PasswordEncoder passwordEncoder;
 
     public Account save(Account account) {
+        System.out.println("PASSWORD" + account);
         account.setPassword(passwordEncoder.encode(account.getPassword()));
         if (account.getAuthorities() == null) {
             account.setAuthorities(Authority.USER.toString());

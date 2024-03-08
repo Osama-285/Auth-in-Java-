@@ -2,10 +2,17 @@ package org.authentication.Auth.Controller;
 
 import org.authentication.Auth.Model.Account;
 import org.authentication.Auth.Payload.AccountDTO;
-
+import org.authentication.Auth.Payload.LoginDTO;
+import org.authentication.Auth.Payload.TokenDTO;
+import org.authentication.Auth.Services.AccountService;
+import org.authentication.Auth.Services.TokenService;
 import org.authentication.Auth.Util.AccountStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,13 +26,38 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api")
 @Slf4j
 public class AuthController {
+
+    @Autowired
+    private AccountService accountService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private TokenService tokenService;
+
+    @PostMapping("/token")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<TokenDTO> authToken(@Valid @RequestBody LoginDTO loginDTO) {
+        try {
+            Authentication authentication = authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
+            return ResponseEntity.ok(new TokenDTO(tokenService.generateToken(authentication)));
+        } catch (Exception e) {
+            log.debug(AccountStatus.TOKEN_GENERATION_ERROR.toString() + ": " + e.getMessage());
+            return new ResponseEntity<>(new TokenDTO(null), HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
     @PostMapping(value = "/signup", produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> addUser(@Valid @RequestBody AccountDTO accountDTO) {
         try {
             Account account = new Account();
             account.setEmail(accountDTO.getEmail());
-            account.setPassword(account.getPassword());
+            account.setPassword(accountDTO.getPassword());
+            System.out.println("USERINPUT" + account + accountDTO);
+            accountService.save(account);
             return ResponseEntity.ok(AccountStatus.ACCOUNT_ADDED.toString());
         } catch (Exception e) {
             log.debug(AccountStatus.ADD_ACCOUNT_ERROR.toString() + ": " + e.getMessage());
