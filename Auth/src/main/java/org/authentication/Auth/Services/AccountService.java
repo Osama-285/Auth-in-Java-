@@ -34,6 +34,12 @@ public class AccountService implements UserDetailsService {
         return accountRepo.save(account);
     }
 
+    public List<Account> findall() {
+
+        return accountRepo.findAll();
+
+    }
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<Account> optionalUser = accountRepo.findByEmail(email);

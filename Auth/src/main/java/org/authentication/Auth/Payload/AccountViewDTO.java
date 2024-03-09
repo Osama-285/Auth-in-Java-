@@ -1,18 +1,16 @@
 package org.authentication.Auth.Payload;
 
-import jakarta.validation.constraints.Email;
-
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
-
-public class AccountDTO {
-    @Email
+@AllArgsConstructor
+@NoArgsConstructor
+public class AccountViewDTO {
+    private long id;
     private String email;
-
-    private String password;
-
     private String authorities;
 }

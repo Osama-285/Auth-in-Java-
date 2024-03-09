@@ -5,5 +5,5 @@ public enum Authority {
     WRITE,
     UPDATE,
     USER, // Can update delete self object, read anything
-    ADM
+    ADMIN
 }

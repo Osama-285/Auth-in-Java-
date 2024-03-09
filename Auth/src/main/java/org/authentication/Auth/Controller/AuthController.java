@@ -1,7 +1,11 @@
 package org.authentication.Auth.Controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.authentication.Auth.Model.Account;
 import org.authentication.Auth.Payload.AccountDTO;
+import org.authentication.Auth.Payload.AccountViewDTO;
 import org.authentication.Auth.Payload.LoginDTO;
 import org.authentication.Auth.Payload.TokenDTO;
 import org.authentication.Auth.Services.AccountService;
@@ -13,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,5 +70,14 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 
         }
+    }
+
+    @GetMapping(value = "/user", produces = "application/json")
+    public List<AccountViewDTO> Users() {
+        List<AccountViewDTO> accounts = new ArrayList<>();
+        for (Account account : accountService.findall()) {
+            accounts.add(new AccountViewDTO(account.getId(), account.getEmail(), account.getAuthorities()));
+        }
+        return accounts;
     }
 }
