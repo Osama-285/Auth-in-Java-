@@ -11,5 +11,5 @@ public class AuthoritiesDTO {
 
     @NotBlank
     @Schema(description = "Authorities", example = "USER", required = true)
-    private String authorites;
+    private String authorities;
 }

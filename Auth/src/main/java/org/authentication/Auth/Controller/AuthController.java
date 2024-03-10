@@ -9,6 +9,7 @@ import org.authentication.Auth.Payload.AccountDTO;
 import org.authentication.Auth.Payload.AccountViewDTO;
 import org.authentication.Auth.Payload.AuthoritiesDTO;
 import org.authentication.Auth.Payload.LoginDTO;
+import org.authentication.Auth.Payload.PasswordDTO;
 import org.authentication.Auth.Payload.TokenDTO;
 import org.authentication.Auth.Services.AccountService;
 import org.authentication.Auth.Services.TokenService;
@@ -91,12 +92,25 @@ public class AuthController {
         Optional<Account> optionalAccount = accountService.findByID(user_id);
         if (optionalAccount.isPresent()) {
             Account account = optionalAccount.get();
-            account.setAuthorities(authoritiesDTO.getAuthorites());
+            account.setAuthorities(authoritiesDTO.getAuthorities());
             accountService.save(account);
             AccountViewDTO accountViewDTO = new AccountViewDTO(account.getId(), account.getEmail(),
                     account.getAuthorities());
             return ResponseEntity.ok(accountViewDTO);
         }
         return new ResponseEntity<AccountViewDTO>(new AccountViewDTO(), HttpStatus.BAD_REQUEST);
+    }
+
+    @PutMapping(value = "/users/updatePassword", produces = "application/json")
+    public AccountViewDTO update_password(@Valid @RequestBody PasswordDTO passwordDTO, Authentication authentication) {
+        String email = authentication.getName();
+        System.out.println("NAME  EMAIL " + email);
+        Optional<Account> optionalAccount = accountService.findByEmail(email);
+        Account account = optionalAccount.get();
+        account.setPassword(passwordDTO.getPassword());
+        accountService.save(account);
+        AccountViewDTO accountViewDTO = new AccountViewDTO(account.getId(), account.getEmail(),
+                account.getAuthorities());
+        return accountViewDTO;
     }
 }

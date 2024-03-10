@@ -71,7 +71,8 @@ public class SecurityConfig {
                         (authorize) -> authorize.requestMatchers("/api/signup").permitAll()
                                 .requestMatchers("/api/token").permitAll().requestMatchers("/api/user")
                                 .hasAuthority("SCOPE_USER").requestMatchers("/api/users/{user_id}/update")
-                                .hasAuthority("SCOPE_USER"));
+                                .hasAuthority("SCOPE_USER").requestMatchers("/api/users/updatePassword")
+                                .authenticated());
         httpSecurity.sessionManagement(
                 sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         httpSecurity.oauth2ResourceServer((rs) -> rs.jwt((jwt) -> {
