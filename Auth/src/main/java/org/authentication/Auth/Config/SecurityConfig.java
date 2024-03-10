@@ -70,6 +70,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         (authorize) -> authorize.requestMatchers("/api/signup").permitAll()
                                 .requestMatchers("/api/token").permitAll().requestMatchers("/api/user")
+                                .hasAuthority("SCOPE_USER").requestMatchers("/api/users/{user_id}/update")
                                 .hasAuthority("SCOPE_USER"));
         httpSecurity.sessionManagement(
                 sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

@@ -40,6 +40,20 @@ public class AccountService implements UserDetailsService {
 
     }
 
+    public Optional<Account> findByEmail(String email) {
+        return accountRepo.findByEmail(email);
+
+    }
+
+    public Optional<Account> findByID(long id) {
+        return accountRepo.findById(id);
+
+    }
+
+    public void deleteByID(long id) {
+        accountRepo.deleteById(id);
+    }
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<Account> optionalUser = accountRepo.findByEmail(email);
