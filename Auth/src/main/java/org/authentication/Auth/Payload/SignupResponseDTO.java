@@ -10,4 +10,5 @@ import lombok.Setter;
 public class SignupResponseDTO {
     private String status;
     private String token;
+    private String message;
 }

@@ -17,6 +17,7 @@ import org.authentication.Auth.Services.AccountService;
 import org.authentication.Auth.Services.TokenService;
 import org.authentication.Auth.Util.AccountStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -99,14 +100,25 @@ public class AuthController {
             accountService.save(account);
 
             String token = tokenService.generateToken(authentication);
-            SignupResponseDTO responseDTO = new SignupResponseDTO(AccountStatus.ACCOUNT_ADDED.toString(), token);
+            SignupResponseDTO responseDTO = new SignupResponseDTO(AccountStatus.ACCOUNT_ADDED.toString(), token, null);
 
             return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
             log.debug(AccountStatus.ADD_ACCOUNT_ERROR.toString() + ": " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            String errorMessage;
+            HttpStatus status = HttpStatus.BAD_REQUEST;
 
+            // Check if the exception is due to an existing user
+            if (e instanceof DataIntegrityViolationException) {
+                errorMessage = "User with this email already exists";
+            } else {
+                errorMessage = e.getMessage();
+            }
+
+            SignupResponseDTO responseDTO = new SignupResponseDTO(status.toString(), null, errorMessage);
+            return ResponseEntity.status(status).body(responseDTO);
         }
+
     }
 
     @GetMapping(value = "/user", produces = "application/json")
