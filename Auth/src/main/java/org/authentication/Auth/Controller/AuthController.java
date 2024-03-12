@@ -10,6 +10,8 @@ import org.authentication.Auth.Payload.AccountViewDTO;
 import org.authentication.Auth.Payload.AuthoritiesDTO;
 import org.authentication.Auth.Payload.LoginDTO;
 import org.authentication.Auth.Payload.PasswordDTO;
+import org.authentication.Auth.Payload.ProfileDTO;
+import org.authentication.Auth.Payload.SignupResponseDTO;
 import org.authentication.Auth.Payload.TokenDTO;
 import org.authentication.Auth.Services.AccountService;
 import org.authentication.Auth.Services.TokenService;
@@ -20,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,9 +63,29 @@ public class AuthController {
 
     }
 
+    // @PostMapping(value = "/signup", produces = "application/json")
+    // @ResponseStatus(HttpStatus.CREATED)
+    // public ResponseEntity<String> addUser(@Valid @RequestBody AccountDTO
+    // accountDTO) {
+    // try {
+    // Account account = new Account();
+    // account.setEmail(accountDTO.getEmail());
+    // account.setPassword(accountDTO.getPassword());
+    // account.setAuthorities(accountDTO.getAuthorities());
+    // System.out.println("USERINPUT" + account + accountDTO);
+    // accountService.save(account);
+    // return ResponseEntity.ok(AccountStatus.ACCOUNT_ADDED.toString());
+    // } catch (Exception e) {
+    // log.debug(AccountStatus.ADD_ACCOUNT_ERROR.toString() + ": " +
+    // e.getMessage());
+    // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+
+    // }
+    // }
+
     @PostMapping(value = "/signup", produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<String> addUser(@Valid @RequestBody AccountDTO accountDTO) {
+    public ResponseEntity<SignupResponseDTO> addUser(@Valid @RequestBody AccountDTO accountDTO) {
         try {
             Account account = new Account();
             account.setEmail(accountDTO.getEmail());
@@ -70,7 +93,15 @@ public class AuthController {
             account.setAuthorities(accountDTO.getAuthorities());
             System.out.println("USERINPUT" + account + accountDTO);
             accountService.save(account);
-            return ResponseEntity.ok(AccountStatus.ACCOUNT_ADDED.toString());
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(accountDTO.getEmail(), accountDTO.getPassword()));
+
+            accountService.save(account);
+
+            String token = tokenService.generateToken(authentication);
+            SignupResponseDTO responseDTO = new SignupResponseDTO(AccountStatus.ACCOUNT_ADDED.toString(), token);
+
+            return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
             log.debug(AccountStatus.ADD_ACCOUNT_ERROR.toString() + ": " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -106,6 +137,8 @@ public class AuthController {
     public AccountViewDTO update_password(@Valid @RequestBody PasswordDTO passwordDTO, Authentication authentication) {
         String email = authentication.getName();
         System.out.println("NAME  EMAIL " + email);
+        Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println("USER R R R " + user);
         Optional<Account> optionalAccount = accountService.findByEmail(email);
         Account account = optionalAccount.get();
         account.setPassword(passwordDTO.getPassword());
@@ -116,5 +149,13 @@ public class AuthController {
     }
 
     @GetMapping(value = "/profile", produces = "application/json")
-    public 
+    public ProfileDTO profile(Authentication authentication) {
+        String email = authentication.getName();
+        Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println("USER R R R " + user);
+        Optional<Account> optionalAccount = accountService.findByEmail(email);
+        Account account = optionalAccount.get();
+        ProfileDTO profileDTO = new ProfileDTO(account.getId(), account.getEmail(), account.getAuthorities());
+        return profileDTO;
+    }
 }
