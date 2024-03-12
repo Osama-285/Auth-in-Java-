@@ -67,6 +67,7 @@ public class AuthController {
             Account account = new Account();
             account.setEmail(accountDTO.getEmail());
             account.setPassword(accountDTO.getPassword());
+            account.setAuthorities(accountDTO.getAuthorities());
             System.out.println("USERINPUT" + account + accountDTO);
             accountService.save(account);
             return ResponseEntity.ok(AccountStatus.ACCOUNT_ADDED.toString());
@@ -113,4 +114,7 @@ public class AuthController {
                 account.getAuthorities());
         return accountViewDTO;
     }
+
+    @GetMapping(value = "/profile", produces = "application/json")
+    public 
 }
