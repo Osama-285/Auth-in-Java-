@@ -9,7 +9,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -72,7 +71,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/token").permitAll().requestMatchers("/api/user")
                                 .hasAuthority("SCOPE_USER").requestMatchers("/api/users/{user_id}/update")
                                 .hasAuthority("SCOPE_USER").requestMatchers("/api/users/updatePassword")
-                                .authenticated());
+                                .authenticated().requestMatchers("/api/profile").authenticated()
+                                .requestMatchers("/api/delete").authenticated());
         httpSecurity.sessionManagement(
                 sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         httpSecurity.oauth2ResourceServer((rs) -> rs.jwt((jwt) -> {
