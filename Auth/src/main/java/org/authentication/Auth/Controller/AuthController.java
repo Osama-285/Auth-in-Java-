@@ -51,21 +51,25 @@ public class AuthController {
     @Autowired
     private TokenService tokenService;
 
-    @PostMapping("/token")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<TokenDTO> authToken(@Valid @RequestBody LoginDTO loginDTO) {
-        try {
-            Authentication authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
-            return ResponseEntity.ok(new TokenDTO(tokenService.generateToken(authentication)));
-        } catch (Exception e) {
-            log.debug(AccountStatus.TOKEN_GENERATION_ERROR.toString() + ": " + e.getMessage());
-            return new ResponseEntity<>(new TokenDTO(null), HttpStatus.BAD_REQUEST);
-        }
+    // @PostMapping("/token")
+    // @ResponseStatus(HttpStatus.OK)
+    // public ResponseEntity<TokenDTO> authToken(@Valid @RequestBody LoginDTO
+    // loginDTO) {
+    // try {
+    // Authentication authentication = authenticationManager
+    // .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getEmail(),
+    // loginDTO.getPassword()));
+    // return ResponseEntity.ok(new
+    // TokenDTO(tokenService.generateToken(authentication)));
+    // } catch (Exception e) {
+    // log.debug(AccountStatus.TOKEN_GENERATION_ERROR.toString() + ": " +
+    // e.getMessage());
+    // return new ResponseEntity<>(new TokenDTO(null), HttpStatus.BAD_REQUEST);
+    // }
 
-    }
+    // }
 
-    @PostMapping(value = "/login", produces = "application/json")
+    @PostMapping(value = { "/token", "/login" }, produces = "application/json")
     public ResponseEntity<TokenDTO> login(@Valid @RequestBody LoginDTO loginDTO) {
         try {
             Authentication authentication = authenticationManager
